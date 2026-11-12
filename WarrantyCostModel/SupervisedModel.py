@@ -1,243 +1,156 @@
-"""Predict observed warranty cost using information available before field failure."""
-
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, KFold, train_test_split
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 
-BASE_DIR = Path(__file__).resolve().parent
-DATA_PATH = BASE_DIR / "Data_Full.xlsx"
-PREDICTIONS_PATH = BASE_DIR / "SupervisedTestPredictions.csv"
+DATA_PATH = Path(__file__).resolve().parent / "TrainingData_Updated.csv"
+TARGET_COLUMN = "Warranty Cost Mean"
 
-ID_COLUMN = "Serial Number"
-TARGET_COLUMN = "Warranty Cost"
-CATEGORY_BASELINE_COLUMN = "Product Family"
-
-# These fields describe product configuration, manufacturing rework, or EOLT,
-# and are available before the unit's field failure.
-CATEGORICAL_FEATURES = [
-    "Product Family",
-    "Facility",
-    "Controls Revision",
-    "Coil Supplier",
-    "Shift",
-    "Defect Category",
-    "Repair Type",
-    "Disposition Code",
-    "Test Station",
-    "Failure Mode",
-    "Pass After Repair",
-    "Retested",
-]
-NUMERIC_FEATURES = ["Labor Hours", "Material Cost", "Rework Hours"]
-FEATURE_COLUMNS = CATEGORICAL_FEATURES + NUMERIC_FEATURES
-
-K_VALUES = (1, 3, 5, 8, 10, 15, 20, 30, 40, 50, 75, 100)
+# Set to selected CSV column names, or None to use all columns except the target.
+FEATURE_COLUMNS: list[str] | None = None
+K_VALUES = (3, 5, 8, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200)
 WEIGHT_OPTIONS = ("uniform", "distance")
 MINKOWSKI_P_VALUES = (1, 2)
+TEST_SIZE = 0.30
+CV_FOLDS = 5
 RANDOM_STATE = 42
-TEST_SIZE = 0.20
-VALIDATION_SIZE_OF_TRAINING = 0.25
 
 
-def _make_model(k: int, weights: str, p: int) -> Pipeline:
-    preprocessing = ColumnTransformer(
-        transformers=[
+def _make_model(
+    numeric_columns: list[str],
+    categorical_columns: list[str],
+) -> Pipeline:
+    transformers: list[tuple[str, object, list[str]]] = []
+    if numeric_columns:
+        transformers.append(("numeric", MinMaxScaler(), numeric_columns))
+    if categorical_columns:
+        transformers.append(
             (
                 "categorical",
                 OneHotEncoder(handle_unknown="ignore"),
-                CATEGORICAL_FEATURES,
-            ),
-            ("numeric", StandardScaler(), NUMERIC_FEATURES),
-        ]
-    )
+                categorical_columns,
+            )
+        )
+
     return Pipeline(
         [
-            ("preprocessing", preprocessing),
             (
-                "knn",
-                KNeighborsRegressor(
-                    n_neighbors=k,
-                    weights=weights,
-                    p=p,
-                ),
+                "preprocessing",
+                ColumnTransformer(transformers=transformers, remainder="drop"),
             ),
+            ("knn", KNeighborsRegressor()),
         ]
     )
-
-
-def _score_predictions(
-    actual: pd.Series, predicted: np.ndarray
-) -> dict[str, float]:
-    actual_total = float(actual.sum())
-    predicted_total = float(predicted.sum())
-    total_bias = predicted_total - actual_total
-    return {
-        "MAE": float(mean_absolute_error(actual, predicted)),
-        "RMSE": float(np.sqrt(mean_squared_error(actual, predicted))),
-        "R2": float(r2_score(actual, predicted)),
-        "Actual test total": actual_total,
-        "Predicted test total": predicted_total,
-        "Total bias": total_bias,
-        "Total bias percent": (
-            100 * total_bias / actual_total if actual_total != 0 else float("nan")
-        ),
-    }
 
 
 def train_and_evaluate(
-    data: pd.DataFrame,
-) -> tuple[Pipeline, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    required_columns = {
-        ID_COLUMN,
-        TARGET_COLUMN,
-        CATEGORY_BASELINE_COLUMN,
-        *FEATURE_COLUMNS,
-    }
-    missing_columns = required_columns - set(data.columns)
+    training_data: pd.DataFrame,
+) -> tuple[Pipeline, dict[str, float | int | str]]:
+    if TARGET_COLUMN not in training_data.columns:
+        raise ValueError(f"Training data must include {TARGET_COLUMN!r}")
+
+    feature_columns = (
+        FEATURE_COLUMNS
+        if FEATURE_COLUMNS is not None
+        else [column for column in training_data.columns if column != TARGET_COLUMN]
+    )
+    if not feature_columns:
+        raise ValueError("Select at least one feature column")
+
+    missing_columns = set(feature_columns + [TARGET_COLUMN]) - set(training_data.columns)
     if missing_columns:
-        raise ValueError(f"Data is missing required columns: {sorted(missing_columns)}")
-    if data[ID_COLUMN].isna().any() or data[ID_COLUMN].duplicated().any():
-        raise ValueError(f"{ID_COLUMN} must be present and unique for every unit")
+        raise ValueError(f"Training data is missing columns: {sorted(missing_columns)}")
 
-    model_data = data[
-        [ID_COLUMN, *FEATURE_COLUMNS, TARGET_COLUMN]
-    ].copy()
-    model_data[TARGET_COLUMN] = pd.to_numeric(
-        model_data[TARGET_COLUMN], errors="raise"
-    )
-    if model_data[FEATURE_COLUMNS + [TARGET_COLUMN]].isna().any().any():
-        raise ValueError("Model features and warranty cost must not contain missing values")
-    if not np.isfinite(model_data[TARGET_COLUMN].to_numpy(dtype=float)).all():
-        raise ValueError("Warranty cost must be finite")
-    if (model_data[TARGET_COLUMN] < 0).any():
-        raise ValueError("Warranty cost must be nonnegative")
+    features = training_data[feature_columns].copy()
+    target = pd.to_numeric(training_data[TARGET_COLUMN], errors="raise")
+    if features.isna().any().any() or target.isna().any():
+        raise ValueError("Selected features and target must not contain missing values")
+    if not np.isfinite(target.to_numpy(dtype=float)).all():
+        raise ValueError("Target values must be finite")
 
-    train_validation, test = train_test_split(
-        model_data, test_size=TEST_SIZE, random_state=RANDOM_STATE
-    )
-    train, validation = train_test_split(
-        train_validation,
-        test_size=VALIDATION_SIZE_OF_TRAINING,
+    # Cluster labels are numeric IDs but represent categories, not magnitudes.
+    categorical_columns = [
+        column
+        for column in feature_columns
+        if (
+            not pd.api.types.is_numeric_dtype(features[column].dtype)
+            or pd.api.types.is_bool_dtype(features[column].dtype)
+            or column == "Cluster"
+        )
+    ]
+    numeric_columns = [
+        column for column in feature_columns if column not in categorical_columns
+    ]
+    for column in numeric_columns:
+        values = pd.to_numeric(features[column], errors="raise").to_numpy(dtype=float)
+        if not np.isfinite(values).all():
+            raise ValueError(f"Numeric feature {column!r} must contain finite values")
+        features[column] = values
+
+    train_features, test_features, train_target, test_target = train_test_split(
+        features,
+        target,
+        test_size=TEST_SIZE,
         random_state=RANDOM_STATE,
     )
 
-    best_config: tuple[float, int, str, int] | None = None
-    for k in K_VALUES:
-        if k > len(train):
-            continue
-        for weights in WEIGHT_OPTIONS:
-            for p in MINKOWSKI_P_VALUES:
-                candidate = _make_model(k, weights, p)
-                candidate.fit(train[FEATURE_COLUMNS], train[TARGET_COLUMN])
-                validation_prediction = candidate.predict(validation[FEATURE_COLUMNS])
-                validation_rmse = float(
-                    np.sqrt(
-                        mean_squared_error(
-                            validation[TARGET_COLUMN], validation_prediction
-                        )
-                    )
-                )
-                config = (validation_rmse, k, weights, p)
-                if best_config is None or config[0] < best_config[0]:
-                    best_config = config
-
-    if best_config is None:
+    candidate_ks = [k for k in K_VALUES if k <= len(train_features)]
+    if not candidate_ks:
         raise ValueError("No valid k values for the training set")
 
-    best_validation_rmse, best_k, best_weights, best_p = best_config
-    fitted_data = pd.concat([train, validation])
-    model = _make_model(best_k, best_weights, best_p)
-    model.fit(fitted_data[FEATURE_COLUMNS], fitted_data[TARGET_COLUMN])
-    knn_prediction = model.predict(test[FEATURE_COLUMNS])
+    cross_validation = KFold(
+        n_splits=CV_FOLDS,
+        shuffle=True,
+        random_state=RANDOM_STATE,
+    )
+    search = GridSearchCV(
+        estimator=_make_model(numeric_columns, categorical_columns),
+        param_grid={
+            "knn__n_neighbors": candidate_ks,
+            "knn__weights": WEIGHT_OPTIONS,
+            "knn__p": MINKOWSKI_P_VALUES,
+        },
+        scoring="neg_root_mean_squared_error",
+        cv=cross_validation,
+        n_jobs=-1,
+        refit=True,
+    )
+    search.fit(train_features, train_target)
 
-    overall_mean = float(fitted_data[TARGET_COLUMN].mean())
-    overall_prediction = np.full(len(test), overall_mean)
-    family_means = fitted_data.groupby(CATEGORY_BASELINE_COLUMN)[
-        TARGET_COLUMN
-    ].mean()
-    family_prediction = (
-        test[CATEGORY_BASELINE_COLUMN].map(family_means).fillna(overall_mean).to_numpy()
-    )
-    train_mean = float(train[TARGET_COLUMN].mean())
-    train_family_means = train.groupby(CATEGORY_BASELINE_COLUMN)[TARGET_COLUMN].mean()
-    validation_family_prediction = (
-        validation[CATEGORY_BASELINE_COLUMN]
-        .map(train_family_means)
-        .fillna(train_mean)
-    )
-
-    metrics = pd.DataFrame(
-        {
-            "Model": ["Overall mean baseline", "Product Family mean baseline", "kNN"],
-            "Validation RMSE": [
-                float(
-                    np.sqrt(
-                        mean_squared_error(
-                            validation[TARGET_COLUMN],
-                            np.full(len(validation), train_mean),
-                        )
-                    )
-                ),
-                float(
-                    np.sqrt(
-                        mean_squared_error(
-                            validation[TARGET_COLUMN],
-                            validation_family_prediction,
-                        )
-                    )
-                ),
-                best_validation_rmse,
-            ],
-            "Selected k": [np.nan, np.nan, best_k],
-            "Weights": ["", "", best_weights],
-            "Minkowski p": [np.nan, np.nan, best_p],
-        }
-    )
-
-    test_metrics = pd.DataFrame(
-        [
-            {"Model": "Overall mean baseline", **_score_predictions(test[TARGET_COLUMN], overall_prediction)},
-            {"Model": "Product Family mean baseline", **_score_predictions(test[TARGET_COLUMN], family_prediction)},
-            {"Model": "kNN", **_score_predictions(test[TARGET_COLUMN], knn_prediction)},
-        ]
-    )
-
-    predictions = pd.DataFrame(
-        {
-            ID_COLUMN: test[ID_COLUMN].to_numpy(),
-            "Actual Warranty Cost": test[TARGET_COLUMN].to_numpy(),
-            "Overall Mean Prediction": overall_prediction,
-            "Product Family Mean Prediction": family_prediction,
-            "kNN Prediction": knn_prediction,
-        }
-    )
-    return model, metrics, test_metrics, predictions
+    test_predictions = search.predict(test_features)
+    metrics: dict[str, float | int | str] = {
+        "k": int(search.best_params_["knn__n_neighbors"]),
+        "weights": str(search.best_params_["knn__weights"]),
+        "p": int(search.best_params_["knn__p"]),
+        "cv_rmse": float(-search.best_score_),
+        "test_rmse": float(np.sqrt(mean_squared_error(test_target, test_predictions))),
+        "test_mae": float(mean_absolute_error(test_target, test_predictions)),
+        "test_r2": float(r2_score(test_target, test_predictions)),
+        "training_rows": len(train_features),
+        "test_rows": len(test_features),
+    }
+    return search.best_estimator_, metrics
 
 
 def main() -> None:
-    data = pd.read_excel(DATA_PATH)
-    model, validation_metrics, test_metrics, predictions = train_and_evaluate(data)
-    predictions.to_csv(PREDICTIONS_PATH, index=False)
-
-    print(f"Units: {len(data):,}")
-    print(f"Pre-failure features: {len(FEATURE_COLUMNS)}")
-    print("\nValidation results (used to select kNN settings):")
-    print(validation_metrics.to_string(index=False, float_format=lambda x: f"{x:,.2f}"))
-    print("\nUntouched test results:")
-    print(test_metrics.to_string(index=False, float_format=lambda x: f"{x:,.2f}"))
-    print(f"\nSaved unit-level predictions to {PREDICTIONS_PATH}")
-    print(
-        "This model estimates warranty cost conditional on an observed failure; "
-        "it does not estimate fleet failure probability."
-    )
+    training_data = pd.read_csv(DATA_PATH)
+    _, metrics = train_and_evaluate(training_data)
+    print(f"Training rows: {metrics['training_rows']}")
+    print(f"Test rows: {metrics['test_rows']}")
+    print(f"Best k: {metrics['k']}")
+    print(f"Distance weights: {metrics['weights']}")
+    print(f"Minkowski p: {metrics['p']}")
+    print(f"5-fold training CV RMSE: {metrics['cv_rmse']:.2f}")
+    print(f"Test RMSE: {metrics['test_rmse']:.2f}")
+    print(f"Test MAE: {metrics['test_mae']:.2f}")
+    print(f"Test R²: {metrics['test_r2']:.3f}")
 
 
 if __name__ == "__main__":

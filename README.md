@@ -38,6 +38,8 @@ Regenerate the training data with:
 
 The model predicts `Warranty Cost Mean`. In `WarrantyCostModel\main.py`, set `FEATURE_COLUMNS` to a list of CSV column names to choose predictors; leave it as `None` to consider every column except the target. It selects features and tunes neighbor count, distance weighting, and Minkowski distance using the validation split, with a 50% training, 25% validation, and 25% test split.
 
+`WarrantyCostModel\GetTrainingData.py` excludes field-service columns shared with the combined data, except `Serial Number`, `Date`, and `Product Family`. It also omits the standard deviation of `Warranty Cost` from aggregate predictors to avoid target leakage.
+
 
 To train and evaluate the supervised warranty-cost model on pre-failure product, manufacturing, and EOLT features, run:
 
