@@ -1,0 +1,11 @@
+Program,Applied scope,Cost,In top 20,Share of runs in winning portfolio,In best portfolio,Rank
+Leak Detection,Facility 2 + Supplier B coils,350000,20,1.0,True,1
+Wiring Poka-Yoke,Night shift + Controls Rev A,125000,10,1.0,True,2
+Braze Training,All plants,50000,10,0.977,True,3
+Supplier QA,Supplier B coils,175000,8,0.9956,True,4
+Smart Torque,All lines,100000,8,0.0266,False,5
+Design Validation,Controls Rev A,200000,5,0.0,False,6
+Vision Inspection,All lines,275000,3,0.0004,False,7
+LegacyX Refresh,LegacyX units,500000,0,0.0,False,8
+Predictive Quality Dashboard,Not modelled,150000,0,0.0,False,
+Additional EOLT Station,Not modelled,450000,0,0.0,False,

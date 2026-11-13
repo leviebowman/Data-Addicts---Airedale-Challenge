@@ -1,0 +1,9 @@
+Program,Applied scope,Why,Units covered,Cost,Yearly savings (on its own)
+Braze Training,All plants,"Every leak is logged as a braze defect, at all plants. Narrowing to Facility 2 would save ~$18K of cost but give up ~$130K/yr of savings",1.0,50000.0,289221.25
+Smart Torque,All lines,"Loose terminals are spread evenly across shifts, plants and products",1.0,100000.0,141339.6
+Wiring Poka-Yoke,Night shift + Controls Rev A,100% of fan rotation errors are Night shift; 100% of sensor miswires are Rev A,0.578,125000.0,370715.2
+Design Validation,Controls Rev A,Every controls failure is on Rev A,0.298,200000.0,157021.80000000002
+Vision Inspection,All lines,Wiring failures are spread evenly,1.0,275000.0,379380.05
+Leak Detection,Facility 2 + Supplier B coils,Every leak is at Facility 2 or on a Supplier B coil,0.477,350000.0,2313770.0
+Supplier QA,Supplier B coils,Supplier B is the only supplier with leaks outside Facility 2,0.298,175000.0,913122.5
+LegacyX Refresh,LegacyX units,Program is LegacyX-specific by design,1.0,500000.0,669564.35
