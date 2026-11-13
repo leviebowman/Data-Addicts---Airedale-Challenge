@@ -84,10 +84,28 @@ Note: leaks *only* happen on Supplier B coils or at Facility 2. Supplier A/C coi
 4. Turning this into a cohesive narrative for slides.
 
 ## Outputs
-- `fig1_cost_map.png` — Total Warranty Costs by Failure Types & Program Reach
-- `fig2_program_summary.png` — Program Summary: Top Performing Catalog Programs
-- `fig3_portfolio_frontier.png` — Frontier Chart: Savings vs Cost
-- `fig4_top20_portfolios.png` — The Top 20 Portfolios
-- `fig5_program_reach.png` — Program Reach: yearly savings vs targeted warranty cost, cost and payback per program
-- `fig6_robustness.png` — Robustness Test
-- `portfolio_results.csv`, `program_ranking.csv`, `program_scopes.csv`
+Tables: `outputs/portfolio_results.csv`, `outputs/program_ranking.csv`, `outputs/program_scopes.csv`.
+
+**Total Warranty Costs by Failure Types & Program Reach** (`fig1_cost_map.png`)
+
+![Total warranty costs by failure types and program reach](outputs/fig1_cost_map.png)
+
+**Program Summary: Top Performing Catalog Programs** (`fig2_program_summary.png`)
+
+![Program summary](outputs/fig2_program_summary.png)
+
+**Frontier Chart: Savings vs Cost** (`fig3_portfolio_frontier.png`)
+
+![Frontier chart: savings vs cost](outputs/fig3_portfolio_frontier.png)
+
+**The Top 20 Portfolios** (`fig4_top20_portfolios.png`)
+
+![The top 20 portfolios](outputs/fig4_top20_portfolios.png)
+
+**Program Reach: yearly savings vs targeted warranty cost, cost and payback per program** (`fig5_program_reach.png`)
+
+![Program reach](outputs/fig5_program_reach.png)
+
+**Robustness Test** (`fig6_robustness.png`)
+
+![Robustness test](outputs/fig6_robustness.png)
