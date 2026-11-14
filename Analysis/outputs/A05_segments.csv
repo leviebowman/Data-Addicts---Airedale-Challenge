@@ -1,0 +1,5 @@
+Segment name,Build traits,Cells,Units,Warranty cost,Cost per failed unit,Loose wiring,Fan backwards,Leak,Controls,Share of total cost,Programs that act here
+S1,Facility 2 or Supplier B · 33% Rev A · Day + Night,36,1430,6316471,4417.112587412587,0.365034965034965,0.032167832167832165,0.551048951048951,0.05174825174825175,0.8253073733676863,"Leak Detection, Braze Training, Supplier QA; Design Validation, Poka-Yoke (Rev A); Smart Torque (loose wiring)"
+S2,not Facility 2 / Supplier B · Rev A · Day + Night,12,480,727176,1514.95,0.4979166666666667,0.06666666666666667,0.0,0.4354166666666667,0.09501250216078261,"Design Validation, Poka-Yoke (Rev A); Poka-Yoke (fan) + fix fan-correction rework; Smart Torque (loose wiring)"
+S3,not Facility 2 / Supplier B · Rev B/C · Night,12,442,282253,638.5814479638009,0.7579185520361991,0.2420814479638009,0.0,0.0,0.03687905510136112,Poka-Yoke (fan) + fix fan-correction rework; Smart Torque (loose wiring)
+S4,not Facility 2 / Supplier B · Rev B/C · Day,12,648,327577,505.52006172839504,1.0,0.0,0.0,0.0,0.04280106937016993,Smart Torque (loose wiring)

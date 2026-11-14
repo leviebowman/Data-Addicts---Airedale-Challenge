@@ -1,0 +1,19 @@
+Column,Label,Maps to field category,Units,Agrees with field Failure Category
+Defect Category,Brazing,Leak,788,1.0
+Defect Category,Wiring,Wiring,1929,1.0
+Defect Category,Controls,Controls,283,1.0
+Failure Mode,Loose Terminal,Wiring,1748,1.0
+Failure Mode,Fan Rotation Error,Wiring,181,1.0
+Failure Mode,Refrigerant Leak,Leak,788,1.0
+Failure Mode,Sensor Miswire,Controls,283,1.0
+Repair Type,Rewire,Wiring,1563,1.0
+Repair Type,Fan Rotation Correction,Wiring,366,1.0
+Repair Type,Leak Repair,Leak,788,1.0
+Repair Type,Sensor Rewire,Controls,283,1.0
+Failure Description,Loose Power Wiring,Wiring,1744,1.0
+Failure Description,Condenser Fan Backwards,Wiring,185,1.0
+Failure Description,Refrigerant Leak,Leak,250,1.0
+Failure Description,Suction Leak,Leak,268,1.0
+Failure Description,Service Valve Leak,Leak,270,1.0
+Failure Description,Sensor Fault,Controls,140,1.0
+Failure Description,Communication Fault,Controls,143,1.0

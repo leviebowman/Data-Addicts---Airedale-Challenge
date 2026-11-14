@@ -1,0 +1,3 @@
+Split,Model,Test Accuracy,Test Balanced accuracy,Test Macro F1,Test Log loss,Test Leak AUC
+Chronological (train on earliest 80% of claims),Decision tree,0.71,0.564885496183206,0.48869955156950673,0.4919289472637399,0.8518810954657776
+Chronological,Class prior baseline,0.655,0.3333333333333333,0.2638469284994965,0.8428209828200296,0.5

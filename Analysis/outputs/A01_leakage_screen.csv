@@ -1,0 +1,19 @@
+Column,Tier,Cramer's V with Failure Category,Spearman |rho| with Warranty Cost
+Product Family,1 Build,0.0364646738870131,
+Facility,1 Build,0.2776298265391676,
+Controls Revision,1 Build,0.35751563050760515,
+Coil Supplier,1 Build,0.309140920867138,
+Shift,1 Build,0.019053138184078326,
+Defect Category,2 Factory (pre-ship),1.0,
+Repair Type,2 Factory (pre-ship),1.0,
+Disposition Code,2 Factory (pre-ship),0.03215661545380079,
+Test Station,2 Factory (pre-ship),0.025789996926519298,
+Failure Mode,2 Factory (pre-ship),1.0,
+Customer Region,3 Field (post-failure),0.013922217960449103,
+Labor Hours,2 Factory (pre-ship),,0.03388973717533292
+Material Cost,2 Factory (pre-ship),,0.014498159860970469
+Rework Hours,2 Factory (pre-ship),,0.012087354151448453
+Repair Cost,3 Field (post-failure),,0.9999992339989905
+Downtime Hours,3 Field (post-failure),,0.00300293670505786
+Days To Failure,3 Field (post-failure),,0.01820048875314673
+Service Hours,3 Field (post-failure),,0.006122713174171164

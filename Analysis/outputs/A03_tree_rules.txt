@@ -1,0 +1,22 @@
+|--- Coil Supplier_Supplier B <= 0.50
+|   |--- Facility_Facility 2 <= 0.50
+|   |   |--- Controls Revision_Rev A <= 0.50
+|   |   |   |--- weights: [0.00, 0.00, 877.00] class: Wiring
+|   |   |--- Controls Revision_Rev A >  0.50
+|   |   |   |--- weights: [163.00, 0.00, 221.00] class: Wiring
+|   |--- Facility_Facility 2 >  0.50
+|   |   |--- Controls Revision_Rev A <= 0.50
+|   |   |   |--- weights: [0.00, 156.00, 145.00] class: Leak
+|   |   |--- Controls Revision_Rev A >  0.50
+|   |   |   |--- weights: [29.00, 70.00, 25.00] class: Leak
+|--- Coil Supplier_Supplier B >  0.50
+|   |--- Controls Revision_Rev A <= 0.50
+|   |   |--- Product Family_LegacyX <= 0.50
+|   |   |   |--- weights: [0.00, 229.00, 184.00] class: Leak
+|   |   |--- Product Family_LegacyX >  0.50
+|   |   |   |--- weights: [0.00, 59.00, 36.00] class: Leak
+|   |--- Controls Revision_Rev A >  0.50
+|   |   |--- Product Family_DC200 <= 0.50
+|   |   |   |--- weights: [22.00, 90.00, 41.00] class: Leak
+|   |   |--- Product Family_DC200 >  0.50
+|   |   |   |--- weights: [13.00, 26.00, 14.00] class: Leak

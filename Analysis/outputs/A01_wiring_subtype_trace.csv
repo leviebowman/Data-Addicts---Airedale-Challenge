@@ -1,0 +1,5 @@
+Shift,Failure Mode,Repair Type,Condenser Fan Backwards,Loose Power Wiring
+Day,Loose Terminal,Rewire,0,1147
+Night,Fan Rotation Error,Fan Rotation Correction,98,83
+Night,Loose Terminal,Fan Rotation Correction,87,98
+Night,Loose Terminal,Rewire,0,416

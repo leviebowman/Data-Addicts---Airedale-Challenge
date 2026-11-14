@@ -1,0 +1,2 @@
+Chosen model,Share of achievable log-loss improvement,Shipment-tier accuracy,Top-30% leak cost captured,Rule F2|SupB share flagged,Rule F2|SupB leak cost captured
+Decision tree,0.8982253426028285,1.0,0.6172950625787017,0.485,1.0

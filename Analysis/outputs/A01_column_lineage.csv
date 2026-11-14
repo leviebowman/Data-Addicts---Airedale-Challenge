@@ -1,0 +1,32 @@
+Column,Source dataset,File,Tier (when known),Distinct values,Missing
+Date,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),366,0
+Product Family,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,1 Build,4,0
+Customer Region,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),5,0
+Failure Category,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),3,0
+Failure Description,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),7,0
+Downtime Hours,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),24,0
+Repair Cost,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,3 Field (post-failure),1422,0
+Warranty Eligible,Field Service,Competition_Dataset1_Field_Service_Final.xlsx,constant,1,0
+Claim Date,Warranty,Competition_Dataset2_Warranty_Final.xlsx,3 Field (post-failure),366,0
+Failure Category,Warranty,Competition_Dataset2_Warranty_Final.xlsx,3 Field (post-failure),3,0
+Warranty Cost,Warranty,Competition_Dataset2_Warranty_Final.xlsx,3 Field (post-failure),1809,0
+Days To Failure,Warranty,Competition_Dataset2_Warranty_Final.xlsx,3 Field (post-failure),231,0
+Service Hours,Warranty,Competition_Dataset2_Warranty_Final.xlsx,3 Field (post-failure),24,0
+Product Family,Product Config,Competition_Dataset3_Product_Config_Final.xlsx,1 Build,4,0
+Facility,Product Config,Competition_Dataset3_Product_Config_Final.xlsx,1 Build,4,0
+Controls Revision,Product Config,Competition_Dataset3_Product_Config_Final.xlsx,1 Build,3,0
+Coil Supplier,Product Config,Competition_Dataset3_Product_Config_Final.xlsx,1 Build,3,0
+Facility,Rework,Competition_Dataset4_Rework_Final.xlsx,1 Build,4,0
+Shift,Rework,Competition_Dataset4_Rework_Final.xlsx,1 Build,2,0
+Defect Category,Rework,Competition_Dataset4_Rework_Final.xlsx,2 Factory (pre-ship),3,0
+Repair Type,Rework,Competition_Dataset4_Rework_Final.xlsx,2 Factory (pre-ship),4,0
+Labor Hours,Rework,Competition_Dataset4_Rework_Final.xlsx,2 Factory (pre-ship),56,0
+Material Cost,Rework,Competition_Dataset4_Rework_Final.xlsx,2 Factory (pre-ship),479,0
+Disposition Code,Rework,Competition_Dataset4_Rework_Final.xlsx,2 Factory (pre-ship),2,0
+Facility,EOLT,Competition_Dataset5_EOLT_Final.xlsx,1 Build,4,0
+Shift,EOLT,Competition_Dataset5_EOLT_Final.xlsx,1 Build,2,0
+Test Station,EOLT,Competition_Dataset5_EOLT_Final.xlsx,2 Factory (pre-ship),4,0
+Failure Mode,EOLT,Competition_Dataset5_EOLT_Final.xlsx,2 Factory (pre-ship),4,0
+Rework Hours,EOLT,Competition_Dataset5_EOLT_Final.xlsx,2 Factory (pre-ship),39,0
+Pass After Repair,EOLT,Competition_Dataset5_EOLT_Final.xlsx,constant,1,0
+Retested,EOLT,Competition_Dataset5_EOLT_Final.xlsx,constant,1,0
